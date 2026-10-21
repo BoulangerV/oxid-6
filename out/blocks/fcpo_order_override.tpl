@@ -209,19 +209,33 @@
             }
 
             function onGooglePaymentButtonClicked() {
-                const paymentDataRequest = getGooglePaymentDataRequest();
-                paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
+                let fcpoAgbCheck = 0;
+                fcpoAgbCheckElem = window.document.getElementsByName('ord_agb');
+                fcpoAgbCheckElem.forEach(function (elem) {
+                    if (!fcpoAgbCheck && elem.checked) {
+                        fcpoAgbCheck = 1;
+                    }
+                });
+                console.log(fcpoAgbCheck);
 
-                const paymentsClient = getGooglePaymentsClient();
-                paymentsClient.loadPaymentData(paymentDataRequest)
-                    .then(function(paymentData) {
-                        // handle the response
-                        processPayment(paymentData);
-                    })
-                    .catch(function(err) {
-                        // show error in developer console for debugging
-                        console.error(err);
-                    });
+                if (!fcpoAgbCheck) {
+                    var url = "[{$oViewConf->fcpoGooglePayGetRedirectUrl()}]" + "&stoken=[{$oViewConf->getSessionChallengeToken()}]&sDeliveryAddressMD5=[{$oView->getDeliveryAddressMD5()}]" + '&fnc=execute&ord_agb=0';
+                    window.location = url;
+                } else {
+                    const paymentDataRequest = getGooglePaymentDataRequest();
+                    paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
+
+                    const paymentsClient = getGooglePaymentsClient();
+                    paymentsClient.loadPaymentData(paymentDataRequest)
+                        .then(function(paymentData) {
+                            // handle the response
+                            processPayment(paymentData);
+                        })
+                        .catch(function(err) {
+                            // show error in developer console for debugging
+                            console.error(err);
+                        });
+                }
             }
 
             function processPayment(paymentData) {
@@ -231,7 +245,7 @@
                 paymentToken = paymentData.paymentMethodData.tokenizationData.token;
                 console.log('PaymentToken:');
                 console.log(btoa(paymentToken));
-                var url = "[{$oViewConf->fcpoGooglePayGetRedirectUrl()}]" + "&stoken=[{$oViewConf->getSessionChallengeToken()}]&sDeliveryAddressMD5=[{$oView->getDeliveryAddressMD5()}]" + '&fnc=execute&googlepaytoken=' + btoa(paymentToken);
+                var url = "[{$oViewConf->fcpoGooglePayGetRedirectUrl()}]" + "&ord_agb=1&stoken=[{$oViewConf->getSessionChallengeToken()}]&sDeliveryAddressMD5=[{$oView->getDeliveryAddressMD5()}]" + '&fnc=execute&googlepaytoken=' + btoa(paymentToken);
                 // console.log(url);
                 window.location = url;
             }
