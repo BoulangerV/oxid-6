@@ -216,11 +216,11 @@
                         fcpoAgbCheck = 1;
                     }
                 });
-                console.log(fcpoAgbCheck);
 
                 if (!fcpoAgbCheck) {
                     var url = "[{$oViewConf->fcpoGooglePayGetRedirectUrl()}]" + "&stoken=[{$oViewConf->getSessionChallengeToken()}]&sDeliveryAddressMD5=[{$oView->getDeliveryAddressMD5()}]" + '&fnc=execute&ord_agb=0';
                     window.location = url;
+                    return false;
                 } else {
                     const paymentDataRequest = getGooglePaymentDataRequest();
                     paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
