@@ -5,6 +5,11 @@
     [{include file=$oViewConf->fcpoGetAbsModuleTemplateFrontendPath($sFcPoTemplatePath)}]
 [{/if}]
 
+[{if $oViewConf->fcpoIsGooglePay()}]
+    [{oxstyle include=$oViewConf->fcpoGetModuleCssPath('fcpayone.css')}]
+[{/if}]
+
+
 <script type="text/javascript">
     function fcpoDisableAndSubmit(e, orderForm) {
         var submitButton = e.submitter;
@@ -179,8 +184,21 @@
                             buttonLocale: '[{$oViewConf->fcpoGooglePayGetButtonLocale()}]',
                         }
                     );
-                document.getElementById('orderConfirmAgbBottom').innerHTML = "<div id='payonegooglepaycontainer' class='pull-right'></div>";
+                document.getElementById('orderConfirmAgbBottom').innerHTML = "<div id='payonegoogleoverlay' class='fcpo-googlepay-disabled'><div id='payonegooglepaycontainer' class='pull-right'></div></div>";
                 document.getElementById('payonegooglepaycontainer').appendChild(button);
+
+                fcpoAgbCheckElem = window.document.getElementsByName('ord_agb');
+                if (fcpoAgbCheckElem.length > 0) {
+                    fcpoAgbCheckElem[0].addEventListener('change', function() {
+                        if (this.checked) {
+                            document.getElementById('payonegoogleoverlay').classList.remove('fcpo-googlepay-disabled');
+                        } else {
+                            document.getElementById('payonegoogleoverlay').classList.add('fcpo-googlepay-disabled');
+                        }
+                    });
+                } else {
+                    document.getElementById('payonegoogleoverlay').classList.remove('fcpo-googlepay-disabled');
+                }
             }
 
             function getGoogleTransactionInfo() {
@@ -209,15 +227,8 @@
             }
 
             function onGooglePaymentButtonClicked() {
-                let fcpoAgbCheck = 0;
-                fcpoAgbCheckElem = window.document.getElementsByName('ord_agb');
-                fcpoAgbCheckElem.forEach(function (elem) {
-                    if (!fcpoAgbCheck && elem.checked) {
-                        fcpoAgbCheck = 1;
-                    }
-                });
 
-                if (!fcpoAgbCheck) {
+                if (!fcpoIsAcceptedAGB()) {
                     var url = "[{$oViewConf->fcpoGooglePayGetRedirectUrl()}]" + "&stoken=[{$oViewConf->getSessionChallengeToken()}]&sDeliveryAddressMD5=[{$oView->getDeliveryAddressMD5()}]" + '&fnc=execute&ord_agb=0';
                     window.location = url;
                     return false;
@@ -248,6 +259,21 @@
                 var url = "[{$oViewConf->fcpoGooglePayGetRedirectUrl()}]" + "&ord_agb=1&stoken=[{$oViewConf->getSessionChallengeToken()}]&sDeliveryAddressMD5=[{$oView->getDeliveryAddressMD5()}]" + '&fnc=execute&googlepaytoken=' + btoa(paymentToken);
                 // console.log(url);
                 window.location = url;
+            }
+
+            function fcpoIsAcceptedAGB() {
+                var fcpoAgbCheck = 0;
+                fcpoAgbCheckElem = window.document.getElementsByName('ord_agb');
+                if (fcpoAgbCheckElem.length < 1) {
+                    return 1;
+                }
+
+                fcpoAgbCheckElem.forEach(function (elem) {
+                    if (!fcpoAgbCheck && elem.checked) {
+                        fcpoAgbCheck = 1;
+                    }
+                });
+                return fcpoAgbCheck;
             }
     </script>
     [{/if}]

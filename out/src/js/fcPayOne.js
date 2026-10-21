@@ -868,7 +868,13 @@ function fcpoGetAplOrderInfo (placeOrderButtonForm) {
                     let fcpoAgbCheck = 0;
                     let fcpoAgbCheckElem = window.document.getElementsByName('ord_agb');
                     fcpoAgbCheckElem.forEach(function (elem) {
-                        if (!fcpoAgbCheck && elem.checked) {
+                        if (elem.checked) {
+                            fcpoAgbCheck = 1;
+                        }
+                        if ((elem.type === 'checkbox') && elem.checked) {
+                            fcpoAgbCheck = 1;
+                        }
+                        else if (elem.type === 'hidden' && elem.value == '1') {
                             fcpoAgbCheck = 1;
                         }
                     });
