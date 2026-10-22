@@ -184,7 +184,11 @@
                             buttonLocale: '[{$oViewConf->fcpoGooglePayGetButtonLocale()}]',
                         }
                     );
-                document.getElementById('orderConfirmAgbBottom').innerHTML = "<div id='payonegoogleoverlay' class='fcpo-googlepay-disabled'><div id='payonegooglepaycontainer' class='pull-right'></div></div>";
+                document.getElementById('orderConfirmAgbBottom').innerHTML =
+                    "<div id='payonegoogleoverlay' class='fcpo-googlepay-disabled'>" +
+                    "<div id='payonegooglepaycontainer' class='pull-right'></div>" +
+                    "<div class='fcpo-googlepay-disabled-error-msg'>[{oxmultilang ident="READ_AND_CONFIRM_TERMS"}]</div>" +
+                    "</div>";
                 document.getElementById('payonegooglepaycontainer').appendChild(button);
 
                 fcpoAgbCheckElem = window.document.getElementsByName('ord_agb');
